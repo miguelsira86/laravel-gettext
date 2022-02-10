@@ -6,6 +6,7 @@ use Xinax\LaravelGettext\Config\Models\Config;
 use Xinax\LaravelGettext\Exceptions\DirectoryNotFoundException;
 use Xinax\LaravelGettext\Exceptions\FileCreationException;
 use Xinax\LaravelGettext\Exceptions\LocaleFileNotFoundException;
+use Illuminate\Support\Facades\Blade;
 
 class FileSystem
 {
@@ -106,7 +107,7 @@ class FileSystem
                 $filePath = $file->getRealPath();
                 $compiler->setPath($filePath);
 
-                $contents = $compiler->compileString($fs->get($filePath));
+                $contents = Blade::compileString($fs->get($filePath));
 
                 $compiledPath = $compiler->getCompiledPath($compiler->getPath());
 
