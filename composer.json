@@ -1,5 +1,5 @@
 {
-    "name": "flavienb/laravel-gettext",
+    "name": "boataround/laravel-gettext",
     "description": "Adds localization support to laravel applications in an easy way using Poedit and GNU gettext.",
     "version": "8.0.5",
     "homepage": "https://github.com/zerospam/laravel-gettext",
@@ -26,15 +26,14 @@
     },
     "require": {
         "php": ">=7.2",
-        "laravel/framework": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
-        
+        "laravel/framework": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0",
         "laravel/helpers": "^1.1"
     },
     "require-dev": {
         "mockery/mockery": "dev-master",
         "phpunit/phpunit": "~7.0 || ^8.5 || ^9",
         "squizlabs/php_codesniffer" : "1.5.*",
-        "laravel/laravel": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
+        "laravel/laravel": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0",
         "php-coveralls/php-coveralls": "^2.1"
     },
     "autoload": {
