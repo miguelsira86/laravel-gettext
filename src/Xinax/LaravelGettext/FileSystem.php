@@ -72,8 +72,8 @@ class FileSystem
     /**
      * Build views in order to parse php files
      *
-     * @param  array  $viewPaths
-     * @param  string $domain
+     * @param array $viewPaths
+     * @param string $domain
      * @return bool
      * @throws FileCreationException
      */
@@ -124,7 +124,7 @@ class FileSystem
     /**
      * Constructs and returns the full path to the translation files
      *
-     * @param  null $append
+     * @param null $append
      * @return string
      */
     public function getDomainPath($append = null)
@@ -146,10 +146,10 @@ class FileSystem
      * Creates a configured .po file on $path
      * If PHP are not able to create the file the content will be returned instead
      *
-     * @param  string    $path
-     * @param  string    $locale
-     * @param  string    $domain
-     * @param  bool|true $write
+     * @param string $path
+     * @param string $locale
+     * @param string $domain
+     * @param bool|true $write
      * @return int|string
      */
     public function createPOFile($path, $locale, $domain, $write = true)
@@ -158,7 +158,7 @@ class FileSystem
         $timestamp = date("Y-m-d H:iO");
         $translator = $this->configuration->getTranslator();
         $encoding = $this->configuration->getEncoding();
-
+        $pluralFormConfig = $this->getPluralFormConfigByLocale($locale);
         $relativePath = $this->configuration->getRelativePath();
 
         $keywords = implode(';', $this->configuration->getKeywordsList());
@@ -178,6 +178,10 @@ class FileSystem
         $template .= '"X-Poedit-KeywordsList: ' . $keywords . '\n' . "\"\n";
         $template .= '"X-Poedit-Basepath: ' . $relativePath . '\n' . "\"\n";
         $template .= '"X-Poedit-SourceCharset: ' . $encoding . '\n' . "\"\n";
+
+        if ($pluralFormConfig) {
+            $template .= '"Plural-Forms:' . $pluralFormConfig . '\n' . "\"\n";
+        }
 
         // Source paths
         $sourcePaths = $this->configuration->getSourcesFromDomain($domain);
@@ -228,8 +232,8 @@ class FileSystem
     /**
      * Adds a new locale directory + .po file
      *
-     * @param  String $localePath
-     * @param  String $locale
+     * @param String $localePath
+     * @param String $locale
      * @throws FileCreationException
      */
     public function addLocale($localePath, $locale)
@@ -256,7 +260,7 @@ class FileSystem
 
         $gettextPath = implode(DIRECTORY_SEPARATOR, $data);
         if (!file_exists($gettextPath)) {
-                $this->createDirectory($gettextPath);
+            $this->createDirectory($gettextPath);
         }
 
 
@@ -329,8 +333,8 @@ class FileSystem
     /**
      * Return the relative path from a file or directory to anothe
      *
-     * @param  string $from
-     * @param  string $to
+     * @param string $from
+     * @param string $to
      * @return string
      * @author Laurent Goussard
      */
@@ -338,9 +342,9 @@ class FileSystem
     {
         // Compatibility fixes for Windows paths
         $from = is_dir($from) ? rtrim($from, '\/') . '/' : $from;
-        $to   = is_dir($to)   ? rtrim($to, '\/') . '/'   : $to;
+        $to = is_dir($to) ? rtrim($to, '\/') . '/' : $to;
         $from = str_replace('\\', '/', $from);
-        $to   = str_replace('\\', '/', $to);
+        $to = str_replace('\\', '/', $to);
 
         $from = explode('/', $from);
         $to = explode('/', $to);
@@ -378,7 +382,7 @@ class FileSystem
      * Checks the required directory
      * Optionally checks each local directory, if $checkLocales is true
      *
-     * @param  bool|false $checkLocales
+     * @param bool|false $checkLocales
      * @return bool
      * @throws DirectoryNotFoundException
      */
@@ -476,7 +480,7 @@ class FileSystem
     /**
      * Set the package configuration model
      *
-     * @param  Config $configuration
+     * @param Config $configuration
      * @return $this
      */
     public function setConfiguration(Config $configuration)
@@ -549,7 +553,7 @@ class FileSystem
     /**
      * Removes the directory contents recursively
      *
-     * @param  string $path
+     * @param string $path
      * @return null|boolean
      */
     public static function clearDirectory($path)
@@ -610,13 +614,70 @@ class FileSystem
     {
         $filePath = implode(
             DIRECTORY_SEPARATOR, [
-            $locale,
-            'LC_MESSAGES',
-            $domain . "." . $type
+                $locale,
+                'LC_MESSAGES',
+                $domain . "." . $type
             ]
         );
 
         return $this->getDomainPath($filePath);
+    }
+
+    private function getPluralFormConfigByLocale(string $locale): string
+    {
+        switch ($locale) {
+            case 'bg_BG':
+            case 'ca_ES':
+            case 'da_DK':
+            case 'de_DE':
+            case 'el_GR':
+            case 'en_AU':
+            case 'en_EN':
+            case 'en_US':
+            case 'es_ES':
+            case 'et_EE':
+            case 'fi_FI':
+            case 'hu_HU':
+            case 'it_IT':
+            case 'nl_NL':
+            case 'no_NO':
+            case 'sv_SE':
+                $pluralConfig = 'nplurals=2; plural=n != 1;';
+                break;
+            case 'cs_CZ':
+            case 'sk_SK':
+                $pluralConfig = 'nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;';
+                break;
+            case 'fr_FR':
+            case 'pt_PT':
+            case 'tr_TR':
+                $pluralConfig = 'nplurals=2; plural=n > 1;';
+                break;
+            case 'ru_RU':
+            case 'ru_UA':
+            case 'sr_RS':
+            case 'hr_HR':
+                $pluralConfig = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);';
+                break;
+            case 'lt_LT':
+                $pluralConfig = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);';
+                break;
+            case 'lv_LV':
+                $pluralConfig = 'nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2;';
+                break;
+            case 'pl_PL':
+                $pluralConfig = 'nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);';
+                break;
+            case 'ro_RO':
+                $pluralConfig = 'nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);';
+                break;
+            case 'sl_SL':
+                $pluralConfig = 'nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);';
+                break;
+            default:
+                $pluralConfig = '';
+        };
+        return $pluralConfig;
     }
 
 }
