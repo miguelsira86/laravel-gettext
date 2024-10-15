@@ -48,8 +48,8 @@ class FileSystem
 
     /**
      * @param Config $config
-     * @param $basePath
-     * @param $storagePath
+     * @param        $basePath
+     * @param        $storagePath
      */
     public function __construct(Config $config, $basePath, $storagePath)
     {
@@ -74,6 +74,7 @@ class FileSystem
      *
      * @param array $viewPaths
      * @param string $domain
+     *
      * @return bool
      * @throws FileCreationException
      */
@@ -125,6 +126,7 @@ class FileSystem
      * Constructs and returns the full path to the translation files
      *
      * @param null $append
+     *
      * @return string
      */
     public function getDomainPath($append = null)
@@ -150,6 +152,7 @@ class FileSystem
      * @param string $locale
      * @param string $domain
      * @param bool|true $write
+     *
      * @return int|string
      */
     public function createPOFile($path, $locale, $domain, $write = true)
@@ -162,6 +165,7 @@ class FileSystem
         $relativePath = $this->configuration->getRelativePath();
 
         $keywords = implode(';', $this->configuration->getKeywordsList());
+
 
         $template = 'msgid ""' . "\n";
         $template .= 'msgstr ""' . "\n";
@@ -218,6 +222,7 @@ class FileSystem
      * Validate if the directory can be created
      *
      * @param  $path
+     *
      * @throws FileCreationException
      */
     protected function createDirectory($path)
@@ -234,14 +239,15 @@ class FileSystem
      *
      * @param String $localePath
      * @param String $locale
+     *
      * @throws FileCreationException
      */
     public function addLocale($localePath, $locale)
     {
-        $data = array(
+        $data = [
             $localePath,
-            "LC_MESSAGES"
-        );
+            "LC_MESSAGES",
+        ];
 
         if (!file_exists($localePath)) {
             $this->createDirectory($localePath);
@@ -287,6 +293,7 @@ class FileSystem
      * @param  $localePath
      * @param  $locale
      * @param  $domain
+     *
      * @return bool
      * @throws LocaleFileNotFoundException
      */
@@ -299,7 +306,7 @@ class FileSystem
         ];
 
         if ($this->configuration->getCustomLocale()) {
-            $customLocale = array('C');
+            $customLocale = ['C'];
             array_splice($data, 1, 0, $customLocale);
         }
 
@@ -335,6 +342,7 @@ class FileSystem
      *
      * @param string $from
      * @param string $to
+     *
      * @return string
      * @author Laurent Goussard
      */
@@ -383,6 +391,7 @@ class FileSystem
      * Optionally checks each local directory, if $checkLocales is true
      *
      * @param bool|false $checkLocales
+     *
      * @return bool
      * @throws DirectoryNotFoundException
      */
@@ -481,6 +490,7 @@ class FileSystem
      * Set the package configuration model
      *
      * @param Config $configuration
+     *
      * @return $this
      */
     public function setConfiguration(Config $configuration)
@@ -603,8 +613,8 @@ class FileSystem
     /**
      * Returns the full path for a .po/.mo file from its domain and locale
      *
-     * @param $locale
-     * @param $domain
+     * @param        $locale
+     * @param        $domain
      *
      * @param string $type
      *
@@ -644,14 +654,17 @@ class FileSystem
             case 'sv_SE':
                 $pluralConfig = 'nplurals=2; plural=n != 1;';
                 break;
-            case 'cs_CZ':
-            case 'sk_SK':
-                $pluralConfig = 'nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;';
-                break;
             case 'fr_FR':
             case 'pt_PT':
             case 'tr_TR':
                 $pluralConfig = 'nplurals=2; plural=n > 1;';
+                break;
+            case 'sk_SK':
+            case 'cs_CZ':
+                $pluralConfig = 'nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;';
+                break;
+            case 'is_IS':
+                $pluralConfig = 'nplurals=2; plural=(n%10!=1 || n%100==11);';
                 break;
             case 'ru_RU':
             case 'ru_UA':
@@ -663,7 +676,7 @@ class FileSystem
                 $pluralConfig = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);';
                 break;
             case 'lv_LV':
-                $pluralConfig = 'nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2;';
+                $pluralConfig = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);';
                 break;
             case 'pl_PL':
                 $pluralConfig = 'nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);';
@@ -671,7 +684,7 @@ class FileSystem
             case 'ro_RO':
                 $pluralConfig = 'nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);';
                 break;
-            case 'sl_SL':
+            case 'sl_SI':
                 $pluralConfig = 'nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);';
                 break;
             default:
@@ -679,5 +692,4 @@ class FileSystem
         };
         return $pluralConfig;
     }
-
 }
