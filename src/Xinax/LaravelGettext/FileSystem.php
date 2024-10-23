@@ -7,6 +7,7 @@ use Xinax\LaravelGettext\Exceptions\DirectoryNotFoundException;
 use Xinax\LaravelGettext\Exceptions\FileCreationException;
 use Xinax\LaravelGettext\Exceptions\LocaleFileNotFoundException;
 use Illuminate\Support\Facades\Blade;
+use Gettext\Languages\Language;
 
 class FileSystem
 {
@@ -64,7 +65,7 @@ class FileSystem
     /**
      * Build views in order to parse php files
      *
-     * @param Array $viewPaths
+     * @param Array  $viewPaths
      * @param String $domain
      *
      * @return Boolean status
@@ -72,7 +73,7 @@ class FileSystem
     /**
      * Build views in order to parse php files
      *
-     * @param array $viewPaths
+     * @param array  $viewPaths
      * @param string $domain
      *
      * @return bool
@@ -148,9 +149,9 @@ class FileSystem
      * Creates a configured .po file on $path
      * If PHP are not able to create the file the content will be returned instead
      *
-     * @param string $path
-     * @param string $locale
-     * @param string $domain
+     * @param string    $path
+     * @param string    $locale
+     * @param string    $domain
      * @param bool|true $write
      *
      * @return int|string
@@ -161,11 +162,9 @@ class FileSystem
         $timestamp = date("Y-m-d H:iO");
         $translator = $this->configuration->getTranslator();
         $encoding = $this->configuration->getEncoding();
-        $pluralFormConfig = $this->getPluralFormConfigByLocale($locale);
         $relativePath = $this->configuration->getRelativePath();
 
         $keywords = implode(';', $this->configuration->getKeywordsList());
-
 
         $template = 'msgid ""' . "\n";
         $template .= 'msgstr ""' . "\n";
@@ -183,8 +182,9 @@ class FileSystem
         $template .= '"X-Poedit-Basepath: ' . $relativePath . '\n' . "\"\n";
         $template .= '"X-Poedit-SourceCharset: ' . $encoding . '\n' . "\"\n";
 
-        if ($pluralFormConfig) {
-            $template .= '"Plural-Forms:' . $pluralFormConfig . '\n' . "\"\n";
+        $language = Language::getById($locale);
+        if ($language) {
+            $template .= '"Plural-Forms: nplurals=' . count($language->categories) . '; plural=' . $language->formula . '\n' . "\"\n";
         }
 
         // Source paths
@@ -631,65 +631,5 @@ class FileSystem
         );
 
         return $this->getDomainPath($filePath);
-    }
-
-    private function getPluralFormConfigByLocale(string $locale): string
-    {
-        switch ($locale) {
-            case 'bg_BG':
-            case 'ca_ES':
-            case 'da_DK':
-            case 'de_DE':
-            case 'el_GR':
-            case 'en_AU':
-            case 'en_EN':
-            case 'en_US':
-            case 'es_ES':
-            case 'et_EE':
-            case 'fi_FI':
-            case 'hu_HU':
-            case 'it_IT':
-            case 'nl_NL':
-            case 'no_NO':
-            case 'sv_SE':
-                $pluralConfig = 'nplurals=2; plural=n != 1;';
-                break;
-            case 'fr_FR':
-            case 'pt_PT':
-            case 'tr_TR':
-                $pluralConfig = 'nplurals=2; plural=n > 1;';
-                break;
-            case 'sk_SK':
-            case 'cs_CZ':
-                $pluralConfig = 'nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;';
-                break;
-            case 'is_IS':
-                $pluralConfig = 'nplurals=2; plural=(n%10!=1 || n%100==11);';
-                break;
-            case 'ru_RU':
-            case 'ru_UA':
-            case 'sr_RS':
-            case 'hr_HR':
-                $pluralConfig = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);';
-                break;
-            case 'lt_LT':
-                $pluralConfig = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);';
-                break;
-            case 'lv_LV':
-                $pluralConfig = 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);';
-                break;
-            case 'pl_PL':
-                $pluralConfig = 'nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);';
-                break;
-            case 'ro_RO':
-                $pluralConfig = 'nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);';
-                break;
-            case 'sl_SI':
-                $pluralConfig = 'nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);';
-                break;
-            default:
-                $pluralConfig = '';
-        };
-        return $pluralConfig;
     }
 }
