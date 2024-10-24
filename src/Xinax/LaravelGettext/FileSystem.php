@@ -7,6 +7,7 @@ use Xinax\LaravelGettext\Exceptions\DirectoryNotFoundException;
 use Xinax\LaravelGettext\Exceptions\FileCreationException;
 use Xinax\LaravelGettext\Exceptions\LocaleFileNotFoundException;
 use Illuminate\Support\Facades\Blade;
+use Gettext\Languages\Language;
 
 class FileSystem
 {
@@ -48,8 +49,8 @@ class FileSystem
 
     /**
      * @param Config $config
-     * @param $basePath
-     * @param $storagePath
+     * @param        $basePath
+     * @param        $storagePath
      */
     public function __construct(Config $config, $basePath, $storagePath)
     {
@@ -64,7 +65,7 @@ class FileSystem
     /**
      * Build views in order to parse php files
      *
-     * @param Array $viewPaths
+     * @param Array  $viewPaths
      * @param String $domain
      *
      * @return Boolean status
@@ -72,8 +73,9 @@ class FileSystem
     /**
      * Build views in order to parse php files
      *
-     * @param  array  $viewPaths
-     * @param  string $domain
+     * @param array  $viewPaths
+     * @param string $domain
+     *
      * @return bool
      * @throws FileCreationException
      */
@@ -124,7 +126,8 @@ class FileSystem
     /**
      * Constructs and returns the full path to the translation files
      *
-     * @param  null $append
+     * @param null $append
+     *
      * @return string
      */
     public function getDomainPath($append = null)
@@ -146,10 +149,11 @@ class FileSystem
      * Creates a configured .po file on $path
      * If PHP are not able to create the file the content will be returned instead
      *
-     * @param  string    $path
-     * @param  string    $locale
-     * @param  string    $domain
-     * @param  bool|true $write
+     * @param string    $path
+     * @param string    $locale
+     * @param string    $domain
+     * @param bool|true $write
+     *
      * @return int|string
      */
     public function createPOFile($path, $locale, $domain, $write = true)
@@ -158,7 +162,6 @@ class FileSystem
         $timestamp = date("Y-m-d H:iO");
         $translator = $this->configuration->getTranslator();
         $encoding = $this->configuration->getEncoding();
-
         $relativePath = $this->configuration->getRelativePath();
 
         $keywords = implode(';', $this->configuration->getKeywordsList());
@@ -178,6 +181,11 @@ class FileSystem
         $template .= '"X-Poedit-KeywordsList: ' . $keywords . '\n' . "\"\n";
         $template .= '"X-Poedit-Basepath: ' . $relativePath . '\n' . "\"\n";
         $template .= '"X-Poedit-SourceCharset: ' . $encoding . '\n' . "\"\n";
+
+        $language = Language::getById($locale);
+        if ($language) {
+            $template .= '"Plural-Forms: nplurals=' . count($language->categories) . '; plural=' . $language->formula . '\n' . "\"\n";
+        }
 
         // Source paths
         $sourcePaths = $this->configuration->getSourcesFromDomain($domain);
@@ -214,6 +222,7 @@ class FileSystem
      * Validate if the directory can be created
      *
      * @param  $path
+     *
      * @throws FileCreationException
      */
     protected function createDirectory($path)
@@ -228,16 +237,17 @@ class FileSystem
     /**
      * Adds a new locale directory + .po file
      *
-     * @param  String $localePath
-     * @param  String $locale
+     * @param String $localePath
+     * @param String $locale
+     *
      * @throws FileCreationException
      */
     public function addLocale($localePath, $locale)
     {
-        $data = array(
+        $data = [
             $localePath,
-            "LC_MESSAGES"
-        );
+            "LC_MESSAGES",
+        ];
 
         if (!file_exists($localePath)) {
             $this->createDirectory($localePath);
@@ -256,7 +266,7 @@ class FileSystem
 
         $gettextPath = implode(DIRECTORY_SEPARATOR, $data);
         if (!file_exists($gettextPath)) {
-                $this->createDirectory($gettextPath);
+            $this->createDirectory($gettextPath);
         }
 
 
@@ -283,6 +293,7 @@ class FileSystem
      * @param  $localePath
      * @param  $locale
      * @param  $domain
+     *
      * @return bool
      * @throws LocaleFileNotFoundException
      */
@@ -295,7 +306,7 @@ class FileSystem
         ];
 
         if ($this->configuration->getCustomLocale()) {
-            $customLocale = array('C');
+            $customLocale = ['C'];
             array_splice($data, 1, 0, $customLocale);
         }
 
@@ -329,8 +340,9 @@ class FileSystem
     /**
      * Return the relative path from a file or directory to anothe
      *
-     * @param  string $from
-     * @param  string $to
+     * @param string $from
+     * @param string $to
+     *
      * @return string
      * @author Laurent Goussard
      */
@@ -338,9 +350,9 @@ class FileSystem
     {
         // Compatibility fixes for Windows paths
         $from = is_dir($from) ? rtrim($from, '\/') . '/' : $from;
-        $to   = is_dir($to)   ? rtrim($to, '\/') . '/'   : $to;
+        $to = is_dir($to) ? rtrim($to, '\/') . '/' : $to;
         $from = str_replace('\\', '/', $from);
-        $to   = str_replace('\\', '/', $to);
+        $to = str_replace('\\', '/', $to);
 
         $from = explode('/', $from);
         $to = explode('/', $to);
@@ -378,7 +390,8 @@ class FileSystem
      * Checks the required directory
      * Optionally checks each local directory, if $checkLocales is true
      *
-     * @param  bool|false $checkLocales
+     * @param bool|false $checkLocales
+     *
      * @return bool
      * @throws DirectoryNotFoundException
      */
@@ -476,7 +489,8 @@ class FileSystem
     /**
      * Set the package configuration model
      *
-     * @param  Config $configuration
+     * @param Config $configuration
+     *
      * @return $this
      */
     public function setConfiguration(Config $configuration)
@@ -549,7 +563,7 @@ class FileSystem
     /**
      * Removes the directory contents recursively
      *
-     * @param  string $path
+     * @param string $path
      * @return null|boolean
      */
     public static function clearDirectory($path)
@@ -599,8 +613,8 @@ class FileSystem
     /**
      * Returns the full path for a .po/.mo file from its domain and locale
      *
-     * @param $locale
-     * @param $domain
+     * @param        $locale
+     * @param        $domain
      *
      * @param string $type
      *
@@ -610,13 +624,12 @@ class FileSystem
     {
         $filePath = implode(
             DIRECTORY_SEPARATOR, [
-            $locale,
-            'LC_MESSAGES',
-            $domain . "." . $type
+                $locale,
+                'LC_MESSAGES',
+                $domain . "." . $type
             ]
         );
 
         return $this->getDomainPath($filePath);
     }
-
 }
