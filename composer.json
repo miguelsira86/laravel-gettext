@@ -1,7 +1,7 @@
 {
     "name": "boataround/laravel-gettext",
     "description": "Adds localization support to laravel applications in an easy way using Poedit and GNU gettext.",
-    "version": "8.0.5",
+    "version": "v1.0.1",
     "homepage": "https://github.com/zerospam/laravel-gettext",
     "keywords": [
         "gettext",
