@@ -1,8 +1,7 @@
 {
-    "name": "boataround/laravel-gettext",
+    "name": "miguelsira86/laravel-gettext",
     "description": "Adds localization support to laravel applications in an easy way using Poedit and GNU gettext.",
-    "version": "v1.0.1",
-    "homepage": "https://github.com/zerospam/laravel-gettext",
+    "version": "v1.0.0",
     "keywords": [
         "gettext",
         "localization",
@@ -13,17 +12,10 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Nicolás Daniel Palumbo",
-            "email": "n@xinax.net"
-        },
-        {
-            "name": "Antoine Aflalo",
-            "email": "dev+laravel_gettext@zerospam.ca"
+            "name": "Miguel Sira",
+            "email": "miguelsira86@gmail.com"
         }
     ],
-    "support": {
-        "issues": "https://github.com/zerospam/laravel-gettext/issues"
-    },
     "require": {
         "php": ">=7.2",
         "laravel/framework": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0",
