@@ -1,7 +1,7 @@
 {
     "name": "miguelsira86/laravel-gettext",
     "description": "Adds localization support to laravel applications in an easy way using Poedit and GNU gettext.",
-    "version": "v1.0.0",
+    "version": "v1.0.1",
     "keywords": [
         "gettext",
         "localization",
